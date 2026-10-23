@@ -700,16 +700,31 @@ function hide() {
 }
 
 // Yalnızca worker'dan gelen geçerli JSON "ulaşılabilir" sayılır (kurum engel sayfası bunu taklit edemez)
-function probe() {
+var NEED_TG = true;   // false yaparsan Telegram kontrolü kapanır
+
+// key: JSON içinde aranan alan. relaxed: CORS okunamazsa yine de "ulaşılabilir" say
+function get(url, key, relaxed) {
   return new Promise(function (res) {
     var done = false, ctl = window.AbortController ? new AbortController() : null;
     function fin(v) { if (done) return; done = true; clearTimeout(t); res(v); }
     var t = setTimeout(function () { fin(false); if (ctl) ctl.abort(); }, 6000);
-    fetch(PROBE + "/?_=" + Date.now(), { cache: "no-store", signal: ctl ? ctl.signal : undefined })
+    var sig = ctl ? ctl.signal : undefined;
+    fetch(url, { cache: "no-store", signal: sig })
       .then(function (r) { return r.json(); })
-      .then(function (j) { fin(!!j && typeof j.success === "boolean"); })
-      .catch(function () { fin(false); });
+      .then(function (j) { fin(!!j && typeof j[key] === "boolean"); })
+      .catch(function () {
+        if (!relaxed) return fin(false);
+        fetch(url, { mode: "no-cors", cache: "no-store", signal: sig })
+          .then(function () { fin(true); }, function () { fin(false); });
+      });
   });
+}
+
+function probe() {
+  return Promise.all([
+    get(PROBE + "/?_=" + Date.now(), "success", false),
+    NEED_TG ? get("https://api.telegram.org/bot0/getMe?_=" + Date.now(), "ok", true) : Promise.resolve(true)
+  ]).then(function (r) { return { w: r[0], t: r[1], ok: r[0] && r[1] }; });
 }
 
 function buildQR() {
@@ -728,9 +743,13 @@ function restartBar() {
 }
 function busy(on) { $("gre").disabled = on; $("grt").textContent = on ? "Denetleniyor…" : "Tekrar dene"; }
 
-function block() {
+function block(p) {
   if (!built) { buildQR(); built = true; }
-  $("gwhy").textContent = navigator.onLine === false ? "Cihaz çevrimdışı görünüyor" : "Kurum ağında bağlantı engelli";
+  var why = "Kurum ağında bağlantı engelli";
+  if (navigator.onLine === false) why = "Cihaz çevrimdışı görünüyor";
+  else if (p && p.w && !p.t) why = "Kurum ağında Telegram engelli";
+  else if (p && !p.w && p.t) why = "Kurum ağında Cloudflare engelli";
+  $("gwhy").textContent = why;
   show("block");
   restartBar();
   clearTimeout(timer);
@@ -741,10 +760,10 @@ function block() {
 function check(cb) {
   if (running) return;
   running = true; busy(true);
-  probe().then(function (ok) {
+  probe().then(function (p) {
     running = false; busy(false);
-    if (ok) hide(); else block();
-    if (cb) cb(!ok);
+    if (p.ok) hide(); else block(p);
+    if (cb) cb(!p.ok);
   });
 }
 
