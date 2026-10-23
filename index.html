@@ -234,8 +234,8 @@ Video</label>
 <div class="g-badge"><b></b><span id="gwhy">Kurum ağında bağlantı engelli</span></div>
 <div class="qrw"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span><div class="qr" id="qr"></div><span class="scan"></span></div>
 <h2>Telefonunuzdan bildirin</h2>
-<p>Kurum ağı bu formun sunucusuna erişimi engelliyor. QR kodu okutun, <b>mobil veri</b> ile açıp geri bildiriminizi oradan iletin.</p>
-<ol class="steps"><li><i>1</i>Telefon kamerasını QR koda tutun</li><li><i>2</i>Wi-Fi yerine mobil veriyi kullanın</li><li><i>3</i>Formu doldurup gönderin</li></ol>
+<p>Kurum ağı, geri bildirimin iletildiği <b>Telegram</b> ve <b>Cloudflare</b> altyapısına erişimi engelliyor. Bu ağdan gönderim yapılamaz; <b>kurum ağı dışından</b> bir bağlantıyla devam edin.</p>
+<ol class="steps"><li><i>1</i>Telefon kamerasını QR koda tutun</li><li><i>2</i>Kurum Wi-Fi'ından çıkın; mobil veri ya da ev internetini kullanın</li><li><i>3</i>Formu doldurup gönderin</li></ol>
 <div class="g-act"><button class="btn" id="gre" type="button"><span class="t" id="grt">Tekrar dene</span></button><button class="btn ghost" id="gcp" type="button"><span class="t" id="gct">Bağlantıyı kopyala</span></button></div>
 <div class="g-bar" aria-hidden="true"><i id="gbar"></i></div>
 <button class="g-skip" id="gsk" type="button">Yine de formu aç</button>
@@ -745,10 +745,10 @@ function busy(on) { $("gre").disabled = on; $("grt").textContent = on ? "Denetle
 
 function block(p) {
   if (!built) { buildQR(); built = true; }
-  var why = "Kurum ağında bağlantı engelli";
+  var why = "Telegram ve Cloudflare altyapısı engelli";
   if (navigator.onLine === false) why = "Cihaz çevrimdışı görünüyor";
-  else if (p && p.w && !p.t) why = "Kurum ağında Telegram engelli";
-  else if (p && !p.w && p.t) why = "Kurum ağında Cloudflare engelli";
+  else if (p && p.w && !p.t) why = "Telegram altyapısı engelli";
+  else if (p && !p.w && p.t) why = "Cloudflare altyapısı engelli";
   $("gwhy").textContent = why;
   show("block");
   restartBar();
