@@ -165,6 +165,22 @@ input[type=text]:focus-visible,textarea:focus-visible{outline:0}
 .g-bar i{display:block;height:100%;background:var(--a);transform-origin:left;animation:gbar 10s linear forwards}
 @keyframes gbar{from{transform:scaleX(0)}}
 .g-skip{border:0;background:0;color:var(--mut);font:inherit;font-size:12.5px;text-decoration:underline;cursor:pointer;min-height:36px;padding:0 10px}
+
+
+/* Geniş ekranda iki sütun: QR solda, yazılar sağda */
+@media(min-width:640px){
+.g-card{max-width:660px;display:grid;grid-template-columns:auto 1fr;column-gap:30px;align-items:center;text-align:left;padding:26px 30px 12px}
+.g-card>*{grid-column:2}
+.g-card>.qrw{grid-column:1;grid-row:1/span 5;margin:0;width:250px}
+.g-card>.g-bar,.g-card>.g-skip{grid-column:1/-1}
+.g-card>.g-skip{justify-self:center}
+.g-badge{justify-self:start}
+}
+/* Kısa ekranda (laptop, telefon yatay) adımları gizle, kart sığsın */
+@media(max-height:720px){.steps{display:none}}
+/* Dar ekranda (telefon) QR'ı biraz küçült */
+@media(max-width:639px){.qrw{width:min(56vw,200px)}.g-card{max-width:420px}}
+
 </style>
 </head>
 <body>
