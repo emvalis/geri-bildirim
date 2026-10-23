@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#eef3f4">
+<title>Emvalis | Geri bildirim</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%2314B8A6'/%3E%3Cstop offset='1' stop-color='%230F766E'/%3E%3C/linearGradient%3E%3CclipPath id='c'%3E%3Crect width='64' height='64' rx='15'/%3E%3C/clipPath%3E%3C/defs%3E%3Cg clip-path='url(%23c)'%3E%3Crect width='64' height='64' fill='url(%23g)'/%3E%3Ccircle cx='50' cy='14' r='30' fill='none' stroke='%23fff' stroke-opacity='.12' stroke-width='1.5'/%3E%3Ccircle cx='50' cy='14' r='20' fill='none' stroke='%23fff' stroke-opacity='.16' stroke-width='1.5'/%3E%3Ccircle cx='50' cy='14' r='10' fill='none' stroke='%23fff' stroke-opacity='.22' stroke-width='1.5'/%3E%3C/g%3E%3Cpath d='M16 18h32a4 4 0 0 1 4 4v18a4 4 0 0 1-4 4H33l-10 9v-9h-7a4 4 0 0 1-4-4V22a4 4 0 0 1 4-4z' fill='%23fff'/%3E%3Ccircle cx='23' cy='31' r='3' fill='%230F766E'/%3E%3Ccircle cx='32' cy='31' r='3' fill='%230F766E'/%3E%3Ccircle cx='41' cy='31' r='3' fill='%230F766E'/%3E%3C/svg%3E">
+<style>
+:root{color-scheme:light;--card:#fff;--fld:#f2f6f7;--fldh:#eaf0f2;--tx:#18222d;--mut:#64747f;--a:#0f766e;--ah:#0c625b;--on:#fff;--err:#b4304a;--ok:#15803d;--inf:#0f766e}
+*{box-sizing:border-box;margin:0}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{min-height:100vh;min-height:100dvh;display:grid;place-items:center;background:#eef3f4;color:var(--tx);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+
+/* Pafta (JS ile çizilir) */
+.map{position:fixed;inset:0;z-index:-1;pointer-events:none}
+.plan{position:absolute;inset:0;width:100%;height:100%;display:block}
+.map .n{position:absolute;top:16px;top:max(16px,env(safe-area-inset-top));right:16px;right:max(16px,env(safe-area-inset-right));opacity:.85;animation:float 6s ease-in-out infinite}
+.map .sb{position:absolute;bottom:16px;bottom:max(16px,env(safe-area-inset-bottom));left:16px;left:max(16px,env(safe-area-inset-left));opacity:.85}
+.ada{stroke-dasharray:1;stroke-dashoffset:1;animation:draw 2.4s cubic-bezier(.4,0,.2,1) forwards;animation-delay:calc(var(--i)*.09s)}
+@keyframes draw{to{stroke-dashoffset:0}}
+.pf{opacity:0;animation:show 1s ease-out forwards;animation-delay:calc(1s + var(--i)*.06s)}
+.lb{opacity:0;animation:show 1.2s 2s ease-out forwards}
+@keyframes show{to{opacity:1}}
+.hl{opacity:0;fill-opacity:.2;animation:hl 12s ease-in-out infinite}
+@keyframes hl{0%{opacity:0}8%,26%{opacity:1}34%,100%{opacity:0}}
+@keyframes float{50%{transform:translateY(-5px)}}
+
+.wrap{width:100%;max-width:420px;padding:20px 16px;padding:max(20px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) max(20px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left))}
+.card{position:relative;background:rgba(255,255,255,.96);border-radius:22px;padding:clamp(18px,5vw,24px);box-shadow:0 1px 2px rgba(15,60,70,.08),0 24px 48px -26px rgba(15,60,70,.4);animation:in .6s cubic-bezier(.2,.8,.2,1) backwards}
+@keyframes in{from{opacity:0;transform:translateY(16px) scale(.98)}}
+.head,.field,.btn{animation:rise .5s cubic-bezier(.2,.8,.2,1) backwards}
+.head{animation-delay:.15s}.field:nth-of-type(1){animation-delay:.22s}.field:nth-of-type(2){animation-delay:.29s}.field:nth-of-type(3){animation-delay:.36s}.btn{animation-delay:.43s}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}}
+.head{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.pin{position:relative;flex:none;width:38px;height:38px;border-radius:50%;background:var(--a);display:grid;place-items:center}
+.pin svg{width:19px;height:19px;color:var(--on)}
+.pin::before{content:"";position:absolute;inset:-5px;border-radius:50%;border:1.5px dashed #86bbb6;animation:spin 30s linear infinite}
+.pin::after{content:"";position:absolute;inset:0;border-radius:50%;border:2px solid var(--a);animation:ping 2.8s ease-out infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes ping{from{opacity:.5;transform:scale(1)}to{opacity:0;transform:scale(1.8)}}
+h1{font-size:18px;line-height:1.25;font-weight:650;letter-spacing:-.01em}
+.sub{color:var(--mut);font-size:13px}
+.snd{margin-left:auto;flex:none;width:36px;height:36px;border:0;border-radius:50%;background:var(--fld);color:var(--a);cursor:pointer;display:grid;place-items:center;transition:background .2s,transform .15s}
+.snd:hover{background:var(--fldh)}
+.snd:active{transform:scale(.92)}
+.snd svg{width:18px;height:18px}
+.note{margin:0 0 14px;padding:9px 12px;border-radius:12px;background:#eaf4f2;border-left:3px solid var(--a);color:#35504d;font-size:13px;line-height:1.45;animation:rise .5s .19s cubic-bezier(.2,.8,.2,1) backwards}
+.note b{font-weight:600;color:var(--ah)}
+.field{margin-bottom:12px}
+label,.lbl{display:block;font-size:13px;font-weight:600;margin-bottom:5px}
+input[type=text],textarea{width:100%;padding:10px 13px;border:1.5px solid transparent;border-radius:13px;background:var(--fld);color:var(--tx);font:inherit;font-size:16px;transition:border-color .2s,background .2s,box-shadow .2s}
+textarea{min-height:76px;max-height:200px;resize:vertical;line-height:1.45;display:block}
+input::placeholder,textarea::placeholder{color:var(--mut);opacity:.75}
+input:hover,textarea:hover{background:var(--fldh)}
+input:focus,textarea:focus{outline:0;background:#fff;border-color:var(--a);box-shadow:0 0 0 4px rgba(15,118,110,.14)}
+.msg{display:none;color:var(--err);font-size:12.5px;margin-top:5px;font-weight:500}
+.err input,.err textarea{border-color:var(--err);background:#fff;animation:shake .35s}
+.err .msg{display:block}
+@keyframes shake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.pick{display:inline-flex;align-items:center;gap:8px;margin:0;padding:8px 13px;border:1.5px dashed #bfd2d5;border-radius:12px;cursor:pointer;font-weight:500;font-size:13.5px;color:var(--a);transition:border-color .2s,background .2s,transform .15s}
+.pick svg{width:16px;height:16px;transition:transform .25s}
+.pick:hover,.pick:focus-visible{border-color:var(--a);background:var(--fld)}
+.pick:hover svg{transform:rotate(-20deg) scale(1.1)}
+.pick:active{transform:scale(.97)}
+.hint{font-size:12px;color:var(--mut);flex-basis:100%}
+.cvid{display:block;width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:14px;background:#000;transform:scaleX(-1);margin-bottom:14px}
+.crow{display:flex;gap:10px}
+.rt{text-align:center;color:var(--err);font-weight:600;font-size:14px;margin:-4px 0 12px;animation:blink 1.2s ease-in-out infinite}
+@keyframes blink{50%{opacity:.4}}
+.dlg .btn.ghost{background:var(--fld);color:var(--tx)}
+.dlg .btn.ghost:hover{background:var(--fldh);filter:none}
+.files{display:grid;gap:6px;margin-top:8px}
+.files:empty{display:none}
+.chip{display:flex;align-items:center;gap:8px;padding:2px 3px 2px 12px;border-radius:12px;background:var(--fld);font-size:13px;animation:rise .3s ease-out}
+.chip span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chip button{border:0;background:0;color:var(--mut);cursor:pointer;font:inherit;font-size:13px;min-width:36px;min-height:36px;border-radius:9px;transition:color .2s,background .2s}
+.chip button:hover{color:var(--err);background:#fff}
+.hp{position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden}
+.btn{position:relative;width:100%;height:46px;border:0;border-radius:13px;color:var(--on);font-weight:600;font-size:15.5px;font-family:inherit;cursor:pointer;overflow:hidden;background:var(--a);transition:background .2s,transform .15s,box-shadow .2s}
+.btn::after{content:"";position:absolute;top:0;bottom:0;width:40%;left:-60%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.28),transparent);animation:shine 4s 1.5s ease-in-out infinite}
+@keyframes shine{0%,60%{left:-60%}100%{left:130%}}
+.btn:hover{background:var(--ah);box-shadow:0 8px 18px -8px rgba(15,118,110,.7)}
+.btn:active{transform:scale(.985)}
+.btn:disabled{cursor:progress}
+.btn:disabled::after{display:none}
+.btn.ok{background:var(--ok)}
+.btn .fill{position:absolute;top:0;bottom:0;left:0;width:0;background:rgba(255,255,255,.22);transition:width .25s}
+.btn .t{position:relative;z-index:1}
+:focus-visible{outline:2px solid var(--a);outline-offset:2px}
+input[type=text]:focus-visible,textarea:focus-visible{outline:0}
+
+/* Modal */
+.ov{position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:20px;background:rgba(18,32,40,.45);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);opacity:0;transition:opacity .22s}
+.ov[hidden]{display:none}
+.ov.open{opacity:1}
+.dlg{width:100%;max-width:340px;background:#fff;border-radius:24px;padding:28px 24px 22px;text-align:center;box-shadow:0 30px 60px -20px rgba(10,40,50,.5);transform:translateY(24px) scale(.9);transition:transform .35s cubic-bezier(.2,1.2,.3,1)}
+.ov.open .dlg{transform:none}
+.dlg.err.shk{animation:shake .4s .2s}
+.dlg.ok{--c:var(--ok)}.dlg.err{--c:var(--err)}.dlg.info{--c:var(--inf)}
+.ico{width:64px;height:64px;margin:0 auto 14px;color:var(--c);position:relative}
+.ico::before{content:"";position:absolute;inset:0;border-radius:50%;background:var(--c);opacity:.1;animation:pop .5s .1s backwards cubic-bezier(.2,1.4,.3,1)}
+.ico svg{position:relative;width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.ico .d{stroke-dasharray:1;stroke-dashoffset:1;animation:draw .55s .25s ease-out forwards}
+.ico .d2{animation-delay:.6s}
+@keyframes pop{from{transform:scale(0)}}
+.dlg h2{font-size:18px;font-weight:650;margin-bottom:6px}
+.dlg p{color:var(--mut);font-size:14px;white-space:pre-line;margin-bottom:18px}
+.dlg .btn{background:var(--c)}
+.dlg .btn::after{display:none}
+.dlg .btn:hover{filter:brightness(.92);background:var(--c)}
+
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}.ada,.ico .d{stroke-dashoffset:0}.lb,.pf{opacity:1}}
+</style>
+</head>
+<body>
+<div class="map" aria-hidden="true">
+<svg class="plan" id="plan" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice"></svg>
+<svg class="n" viewBox="0 0 30 44" width="28" height="41"><path d="M15 3L24 34L15 28L6 34Z" fill="#9db9bf"/><path d="M15 3L15 28L6 34Z" fill="#7da2a9"/><text x="15" y="43" text-anchor="middle" font-size="10" font-weight="700" fill="#7da2a9" font-family="system-ui,sans-serif">K</text></svg>
+<svg class="sb" viewBox="0 0 130 26" width="120" height="24"><path d="M1 12H121V18H1Z" fill="none" stroke="#7da2a9"/><path d="M1 12H41V18H1ZM81 12H121V18H81Z" fill="#9db9bf"/><g font-size="9" fill="#7da2a9" font-family="system-ui,sans-serif" text-anchor="middle"><text x="1" y="9">0</text><text x="61" y="9">50</text><text x="121" y="9">100 m</text></g></svg>
+</div>
+
+<div class="wrap">
+<main class="card">
+<div class="head">
+<div class="pin"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8l8-4 8 3-2 10-9 3z"/><circle cx="12" cy="11.5" r="1.6" fill="currentColor"/></svg></div>
+<div><h1>Geri bildirim</h1><p class="sub">Emvalis</p></div>
+<button class="snd" id="snd" type="button" aria-pressed="true" aria-label="Sesi kapat"></button>
+</div>
+<p class="note">Emvalis tarafından geliştirilen yazılımlara ilişkin <b>görüş</b>, <b>öneri</b> ve <b>hata bildirimlerinizi</b> buradan iletebilirsiniz.</p>
+<form id="f" novalidate>
+<div class="hp" aria-hidden="true"><input type="text" name="website" tabindex="-1" autocomplete="off"></div>
+
+<div class="field" id="fs">
+<label for="sicil">Sicil no</label>
+<input type="text" id="sicil" name="sicil" placeholder="ör: tk123654" maxlength="50" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-describedby="sicil-err">
+<div class="msg" id="sicil-err">Sicil numaranızı yazın.</div>
+</div>
+
+<div class="field" id="fm">
+<label for="message">Mesajınız</label>
+<textarea id="message" name="message" rows="3" maxlength="3000" placeholder="Durumu, hatayı ya da önerinizi yazın" aria-describedby="message-err"></textarea>
+<div class="msg" id="message-err">Mesaj boş bırakılamaz.</div>
+</div>
+
+<div class="field">
+<div class="row">
+<label class="pick" id="dz" tabindex="0">
+<input type="file" id="fi" multiple hidden accept="image/*,video/*,.pdf,.doc,.docx,.zip">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.5l-8.6 8.6a5.5 5.5 0 01-7.8-7.8l9-9a3.7 3.7 0 015.2 5.2l-9 9a1.8 1.8 0 01-2.6-2.6l8.3-8.3"/></svg>
+Dosya</label>
+<label class="pick cam" id="dc" tabindex="0">
+<input type="file" id="ci" hidden accept="image/*" capture="environment">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>
+Fotoğraf</label>
+<label class="pick cam" id="dv" tabindex="0">
+<input type="file" id="cv" hidden accept="video/*" capture="environment">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="13" height="12" rx="2"/><path d="M16 10.5l5-3v9l-5-3"/></svg>
+Video</label>
+<span class="hint" id="hint"></span>
+</div>
+<div class="files" id="files"></div>
+</div>
+
+<button class="btn" id="btn" type="submit"><span class="fill" id="fill"></span><span class="t" id="bt">Gönder</span></button>
+</form>
+</main>
+</div>
+
+<div class="ov" id="ov" hidden>
+<div class="dlg" id="dlg" role="alertdialog" aria-modal="true" aria-labelledby="mt" aria-describedby="mm" tabindex="-1">
+<div class="ico" id="mi"></div>
+<h2 id="mt"></h2>
+<p id="mm"></p>
+<button class="btn" id="mo" type="button"><span class="t">Tamam</span></button>
+</div>
+</div>
+
+<div class="ov" id="cov" hidden>
+<div class="dlg info" role="dialog" aria-modal="true" aria-label="Kamera" style="max-width:420px">
+<video class="cvid" id="cvid" autoplay playsinline muted></video>
+<div class="rt" id="crt" hidden>● 00:00</div>
+<div class="crow">
+<button class="btn" id="cshot" type="button"><span class="t" id="cst">Çek</span></button>
+<button class="btn ghost" id="cx" type="button"><span class="t">Vazgeç</span></button>
+</div>
+</div>
+</div>
+
+<script>
+/* Pafta çizimi: sabit tohumla üretilir, her açılışta aynı görünür */
+(function () {
+"use strict";
+var NS = "http://www.w3.org/2000/svg", svg = document.getElementById("plan");
+var s = 7;
+function r() { s = s + 0x6D2B79F5 | 0; var t = Math.imul(s ^ s >>> 15, 1 | s); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }
+function el(n, a, p) { var e = document.createElementNS(NS, n); for (var k in a) e.setAttribute(k, a[k]); p.appendChild(e); return e; }
+function j(v) { return v + (r() - .5) * 10; }
+var W = 1200, H = 800, C = 4, R = 4, bw = W / C, bh = H / R, n = 0;
+el("rect", { width: W, height: H, fill: "#eef3f4" }, svg);
+var gF = el("g", { fill: "#dfeee8" }, svg);
+var gL = el("g", { fill: "none", stroke: "#a9c3c9", "stroke-width": 1.1, "stroke-linejoin": "round" }, svg);
+var gT = el("g", { "font-family": "system-ui,sans-serif", "text-anchor": "middle" }, svg);
+var gH = el("g", { fill: "#0f766e", stroke: "#0f766e", "stroke-width": 1.6 }, svg);
+var cells = [];
+for (var rw = 0; rw < R; rw++) for (var c = 0; c < C; c++) {
+  var x0 = c * bw + 22, y0 = rw * bh + 14, w = bw - 44, h = bh - 28;
+  var cols = 3 + Math.floor(r() * 2), rows = 2 + Math.floor(r() * 2), P = [], i, k, d = "";
+  for (i = 0; i <= cols; i++) { P[i] = []; for (k = 0; k <= rows; k++) P[i][k] = [j(x0 + w * i / cols), j(y0 + h * k / rows)]; }
+  var num = 0;
+  for (i = 0; i < cols; i++) for (k = 0; k < rows; k++) {
+    var a = P[i][k], b = P[i + 1][k], e = P[i + 1][k + 1], f = P[i][k + 1];
+    var q = "M" + a + "L" + b + "L" + e + "L" + f + "Z";
+    d += q; num++;
+    if (r() < .16) el("path", { d: q }, gF);
+    var cx = (a[0] + e[0]) / 2, cy = (a[1] + e[1]) / 2 + 3;
+    var t = el("text", { x: cx.toFixed(0), y: cy.toFixed(0), "font-size": 9, fill: "#93adb4", "class": "pf", style: "--i:" + (n % 30) }, gT);
+    t.textContent = num;
+    cells.push(q);
+  }
+  el("path", { d: d, pathLength: 1, "class": "ada", style: "--i:" + (n++) }, gL);
+  var bt = el("text", { x: x0, y: y0 - 1, "font-size": 10, "font-weight": 700, fill: "#6f98a0", "class": "lb", "text-anchor": "start" }, gT);
+  bt.textContent = 121 + rw * C + c;
+}
+[5, 61, 118].forEach(function (ix, m) {
+  el("path", { d: cells[ix % cells.length], "class": "hl", style: "animation-delay:" + (3 + m * 4) + "s" }, gH);
+});
+})();
+
+/* Form */
+(function () {
+"use strict";
+
+var ENDPOINT = "https://emvalis-feedback.kuralay7221.workers.dev";
+var MAX_FILES = 5;
+var MAX_SIZE = 20 * 1024 * 1024;   // dosya başına (Telegram bot sınırı 50 MB; worker ile aynı olmalı)
+var MAX_TOTAL = 50 * 1024 * 1024;  // toplam
+var COOLDOWN = 30000;
+var LS_KEY = "emvalis-last";
+var BLOCKED = /\.(php|phtml|phar|exe|bat|cmd|sh|com|msi|js|jar|vbs|ps1|scr|cgi|pl|htm|html|apk|dll|lnk|hta)$/i;
+
+function $(id) { return document.getElementById(id); }
+function mb(b) { return (b / 1048576).toFixed(0); }
+
+var files = [], busy = false, resetTimer = 0;
+
+$("hint").textContent = "En fazla " + MAX_FILES + " dosya · her biri " + mb(MAX_SIZE) + " MB";
+
+/* ---------- Uyarı sesleri (dosya gerekmez, Web Audio ile üretilir) ---------- */
+var SND_KEY = "emvalis-snd", ac = null, soundOn = true;
+try { soundOn = localStorage.getItem(SND_KEY) !== "0"; } catch (x) {}
+var SVG0 = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9z"/>';
+var SPK = { on: SVG0 + '<path d="M16.5 8.5a5 5 0 010 7M19 6a8.5 8.5 0 010 12"/></svg>', off: SVG0 + '<path d="M17 9l5 6M22 9l-5 6"/></svg>' };
+
+function paintSnd() {
+  $("snd").innerHTML = soundOn ? SPK.on : SPK.off;
+  $("snd").setAttribute("aria-pressed", soundOn ? "true" : "false");
+  $("snd").setAttribute("aria-label", soundOn ? "Sesi kapat" : "Sesi aç");
+}
+function getAC() {
+  if (!ac) { var C = window.AudioContext || window.webkitAudioContext; if (C) { try { ac = new C(); } catch (x) {} } }
+  if (ac && ac.state === "suspended") ac.resume();
+  return ac;
+}
+// Tarayıcılar sesi ancak kullanıcı etkileşiminden sonra çalmaya izin verir
+["pointerdown", "keydown", "touchstart"].forEach(function (t) { document.addEventListener(t, getAC, { passive: true }); });
+
+function tone(f, t0, d, type, v) {
+  var c = ac, o = c.createOscillator(), g = c.createGain(), t = c.currentTime + t0;
+  o.type = type; o.frequency.value = f;
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.exponentialRampToValueAtTime(v, t + 0.02);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + d);
+  o.connect(g); g.connect(c.destination);
+  o.start(t); o.stop(t + d + 0.05);
+}
+function sfx(type) {
+  if (!soundOn) return;
+  var c = getAC();
+  if (!c) return;
+  function go() {
+    if (type === "ok") { tone(523.25, 0, .25, "sine", .18); tone(659.25, .11, .25, "sine", .18); tone(783.99, .22, .5, "sine", .18); }
+    else if (type === "err") { tone(220, 0, .18, "sawtooth", .1); tone(165, .2, .32, "sawtooth", .1); }
+    else { tone(880, 0, .2, "sine", .15); tone(660, .14, .32, "sine", .12); }
+  }
+  if (c.state === "suspended") c.resume().then(go, function () {}); else go();
+  if (type === "err" && navigator.vibrate) navigator.vibrate([60, 40, 60]);
+}
+$("snd").onclick = function () {
+  soundOn = !soundOn;
+  try { localStorage.setItem(SND_KEY, soundOn ? "1" : "0"); } catch (x) {}
+  paintSnd();
+  if (soundOn) sfx("info");
+};
+paintSnd();
+
+/* ---------- Modal ---------- */
+var ICONS = {
+  ok: '<svg viewBox="0 0 52 52"><circle class="d" pathLength="1" cx="26" cy="26" r="22"/><path class="d d2" pathLength="1" d="M16 27l7 7 14-15"/></svg>',
+  err: '<svg viewBox="0 0 52 52"><circle class="d" pathLength="1" cx="26" cy="26" r="22"/><path class="d d2" pathLength="1" d="M19 19l14 14M33 19L19 33"/></svg>',
+  info: '<svg viewBox="0 0 52 52"><circle class="d" pathLength="1" cx="26" cy="26" r="22"/><path class="d d2" pathLength="1" d="M26 24v11M26 17v.5"/></svg>'
+};
+var lastFocus = null, closeTimer = 0, onClose = null;
+
+function openModal(type, title, text, cb) {
+  clearTimeout(closeTimer);
+  lastFocus = document.activeElement;
+  onClose = cb || null;
+  $("dlg").className = "dlg " + type;
+  $("mi").innerHTML = ICONS[type] || ICONS.info;
+  $("mt").textContent = title;
+  $("mm").textContent = text;
+  $("ov").hidden = false;
+  void $("ov").offsetWidth;
+  $("ov").classList.add("open");
+  if (type === "err") $("dlg").classList.add("shk");
+  sfx(type);
+  $("mo").focus();
+}
+
+function closeModal() {
+  if ($("ov").hidden) return;
+  $("ov").classList.remove("open");
+  closeTimer = setTimeout(function () {
+    $("ov").hidden = true;
+    if (lastFocus && lastFocus.focus) lastFocus.focus();
+    var cb = onClose; onClose = null;
+    if (cb) cb();
+  }, 220);
+}
+
+$("mo").onclick = closeModal;
+$("ov").addEventListener("click", function (e) { if (e.target === $("ov")) closeModal(); });
+document.addEventListener("keydown", function (e) {
+  if ($("ov").hidden) return;
+  if (e.key === "Escape") closeModal();
+  else if (e.key === "Tab") { e.preventDefault(); $("mo").focus(); }
+});
+
+/* ---------- Yardımcılar ---------- */
+function setBtn(text, pct, ok) {
+  $("bt").textContent = text;
+  $("fill").style.width = pct + "%";
+  $("btn").classList.toggle("ok", !!ok);
+}
+function lsGet() { try { return Number(localStorage.getItem(LS_KEY)) || 0; } catch (x) { return 0; } }
+function lsSet(v) { try { localStorage.setItem(LS_KEY, String(v)); } catch (x) {} }
+function totalSize() { var t = 0; for (var i = 0; i < files.length; i++) t += files[i].size; return t; }
+
+function setInvalid(inputId, groupId, bad) {
+  var g = $(groupId);
+  g.classList.remove("err");
+  if (bad) { void g.offsetWidth; g.classList.add("err"); $(inputId).setAttribute("aria-invalid", "true"); }
+  else $(inputId).removeAttribute("aria-invalid");
+}
+[["sicil", "fs"], ["message", "fm"]].forEach(function (p) {
+  $(p[0]).addEventListener("input", function () { setInvalid(p[0], p[1], false); });
+});
+
+function render() {
+  var box = $("files");
+  box.innerHTML = "";
+  files.forEach(function (f, i) {
+    var c = document.createElement("div");
+    c.className = "chip";
+    var s = document.createElement("span");
+    s.textContent = f.name + " · " + (f.size < 1048576 ? Math.max(1, Math.round(f.size / 1024)) + " KB" : (f.size / 1048576).toFixed(1) + " MB");
+    s.title = f.name;
+    var x = document.createElement("button");
+    x.type = "button";
+    x.textContent = "✕";
+    x.setAttribute("aria-label", f.name + " dosyasını kaldır");
+    x.onclick = function () { if (busy) return; files.splice(i, 1); render(); };
+    c.appendChild(s);
+    c.appendChild(x);
+    box.appendChild(c);
+  });
+}
+
+["dz", "dc", "dv"].forEach(function (id) {
+  $(id).onkeydown = function (e) {
+    if (e.key === "Enter" || e.key === " ") { e.preventDefault(); $(id).querySelector("input").click(); }
+  };
+});
+
+function onPick(e) {
+  var input = e.target;
+  var picked = Array.prototype.slice.call(input.files || []);
+  input.value = "";
+  addFiles(picked);
+}
+
+function addFiles(picked) {
+  var msgs = [];
+  function add(m) { if (msgs.indexOf(m) < 0) msgs.push(m); }
+
+  if (busy) return;
+
+  picked.forEach(function (f) {
+    if (files.length >= MAX_FILES) return add("En fazla " + MAX_FILES + " dosya ekleyebilirsiniz.");
+    if (f.size === 0) return add(f.name + " boş bir dosya.");
+    if (BLOCKED.test(f.name)) return add(f.name + " türü güvenlik nedeniyle kabul edilmiyor.");
+    if (f.size > MAX_SIZE) return add(f.name + " " + mb(MAX_SIZE) + " MB sınırını aşıyor.");
+    if (totalSize() + f.size > MAX_TOTAL) return add("Toplam dosya boyutu " + mb(MAX_TOTAL) + " MB'ı geçemez.");
+    var dup = files.some(function (g) {
+      return g.name === f.name && g.size === f.size && g.lastModified === f.lastModified;
+    });
+    if (!dup) files.push(f);
+  });
+
+  render();
+  if (msgs.length) openModal("info", "Bazı dosyalar eklenemedi", msgs.join("\n"));
+}
+$("fi").onchange = $("ci").onchange = $("cv").onchange = onPick;
+
+/* ---------- Bilgisayarda web kamerası (fotoğraf + video) ---------- */
+var touch = (window.matchMedia && matchMedia("(pointer:coarse)").matches) || navigator.maxTouchPoints > 0;
+var canCam = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+var canRec = canCam && typeof MediaRecorder !== "undefined";
+var stream = null, rec = null, chunks = [], recSize = 0, recStart = 0, tick = 0, mode = "photo";
+
+function fmt(sec) { return ("0" + Math.floor(sec / 60)).slice(-2) + ":" + ("0" + sec % 60).slice(-2); }
+
+function closeCam() {
+  clearInterval(tick);
+  if (stream) { stream.getTracks().forEach(function (t) { t.stop(); }); stream = null; }
+  $("cvid").srcObject = null;
+  rec = null; chunks = [];
+  $("crt").hidden = true;
+  $("cov").classList.remove("open");
+  setTimeout(function () { $("cov").hidden = true; }, 220);
+}
+
+function cancelCam() {
+  if (rec && rec.state === "recording") { rec.ondataavailable = null; rec.onstop = null; try { rec.stop(); } catch (x) {} }
+  closeCam();
+}
+
+function openCam(m) {
+  mode = m;
+  navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: m === "video" }).then(function (s) {
+    stream = s;
+    $("cvid").srcObject = s;
+    $("cst").textContent = m === "video" ? "Kaydı başlat" : "Fotoğraf çek";
+    $("crt").hidden = true;
+    $("cov").hidden = false;
+    void $("cov").offsetWidth;
+    $("cov").classList.add("open");
+    $("cshot").focus();
+  }).catch(function () {
+    openModal("err", "Kamera açılamadı", "Kamera/mikrofon izni verilmemiş ya da cihaz bulunamadı. \"Dosya\" ile seçim yapabilirsiniz.");
+  });
+}
+
+function startRec() {
+  var types = ["video/webm;codecs=vp9,opus", "video/webm;codecs=vp8,opus", "video/webm", "video/mp4"], mt = "", i;
+  for (i = 0; i < types.length; i++) if (MediaRecorder.isTypeSupported(types[i])) { mt = types[i]; break; }
+  chunks = []; recSize = 0;
+  var opt = { videoBitsPerSecond: 1500000 };
+  if (mt) opt.mimeType = mt;
+  try { rec = new MediaRecorder(stream, opt); }
+  catch (x) { closeCam(); openModal("err", "Kayıt başlatılamadı", "Tarayıcınız video kaydını desteklemiyor. \"Dosya\" ile video seçebilirsiniz."); return; }
+  rec.ondataavailable = function (e) {
+    if (!e.data || !e.data.size) return;
+    chunks.push(e.data); recSize += e.data.size;
+    if (recSize > MAX_SIZE * 0.95 && rec && rec.state === "recording") rec.stop();   // boyut sınırına gelince otomatik durdur
+  };
+  rec.onstop = function () {
+    var type = (rec && rec.mimeType) || mt || "video/webm";
+    var blob = new Blob(chunks, { type: type });
+    var ext = /mp4/.test(type) ? "mp4" : "webm";
+    closeCam();
+    if (blob.size) addFiles([new File([blob], "video-" + Date.now() + "." + ext, { type: type.split(";")[0], lastModified: Date.now() })]);
+  };
+  rec.start(1000);
+  recStart = Date.now();
+  $("crt").hidden = false;
+  $("crt").textContent = "● 00:00";
+  $("cst").textContent = "Kaydı durdur";
+  tick = setInterval(function () { $("crt").textContent = "● " + fmt(Math.floor((Date.now() - recStart) / 1000)); }, 500);
+}
+
+// Telefonda yerel kamera uygulaması açılır; bilgisayarda web kamerası penceresi
+$("dc").addEventListener("click", function (e) {
+  if (touch || !canCam) return;
+  e.preventDefault();
+  if (!busy) openCam("photo");
+});
+$("dv").addEventListener("click", function (e) {
+  if (touch || !canRec) return;
+  e.preventDefault();
+  if (!busy) openCam("video");
+});
+
+$("cx").onclick = cancelCam;
+$("cov").addEventListener("click", function (e) { if (e.target === $("cov")) cancelCam(); });
+document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !$("cov").hidden) cancelCam(); });
+
+$("cshot").onclick = function () {
+  if (mode === "video") { if (rec && rec.state === "recording") rec.stop(); else startRec(); return; }
+  var v = $("cvid");
+  if (!v.videoWidth) return;
+  var c = document.createElement("canvas");
+  c.width = v.videoWidth; c.height = v.videoHeight;
+  c.getContext("2d").drawImage(v, 0, 0);
+  c.toBlob(function (b) {
+    if (!b) return;
+    closeCam();
+    addFiles([new File([b], "foto-" + Date.now() + ".jpg", { type: "image/jpeg", lastModified: Date.now() })]);
+  }, "image/jpeg", 0.9);
+};
+
+/* ---------- Gönderim ---------- */
+$("f").onsubmit = function (e) {
+  e.preventDefault();
+  if (busy) return;
+
+  var form = e.target;
+  var sicil = $("sicil").value.trim();
+  var msg = $("message").value.trim();
+
+  setInvalid("sicil", "fs", !sicil);
+  setInvalid("message", "fm", !msg);
+  if (!sicil || !msg) { (!sicil ? $("sicil") : $("message")).focus(); return; }
+
+  var now = Date.now(), last = lsGet();
+  var wait = (last && last <= now) ? COOLDOWN - (now - last) : 0;
+  if (wait > 0) {
+    openModal("info", "Biraz bekleyin", Math.ceil(wait / 1000) + " saniye sonra tekrar deneyebilirsiniz.");
+    return;
+  }
+  if (location.protocol === "file:") {
+    openModal("err", "Sayfa dosyadan açılmış", "Gönderim için https://emvalis.rf.gd adresini kullanın.");
+    return;
+  }
+
+  busy = true;
+  $("btn").disabled = true;
+  setBtn("Gönderiliyor… 0%", 0);
+
+  var fd = new FormData(form);
+  fd.set("sicil", sicil);
+  fd.set("message", msg);
+  files.forEach(function (f) { fd.append("files", f, f.name); });
+
+  var xhr = new XMLHttpRequest();
+  xhr.open("POST", ENDPOINT);
+  xhr.timeout = 180000;
+
+  function fail(m, title) {
+    busy = false;
+    $("btn").disabled = false;
+    setBtn("Gönder", 0);
+    openModal("err", title || "Gönderilemedi", m);
+  }
+
+  xhr.upload.onprogress = function (p) {
+    if (p.lengthComputable && p.total > 0) {
+      var v = Math.min(100, Math.round(p.loaded / p.total * 100));
+      setBtn("Gönderiliyor… " + v + "%", v);
+    }
+  };
+  xhr.upload.onload = function () { setBtn("İşleniyor…", 100); };
+
+  xhr.onerror = function () { fail("İnternet bağlantınızı kontrol edip tekrar deneyin.", "Bağlantı kurulamadı"); };
+  xhr.onabort = function () { fail("Lütfen tekrar deneyin.", "Gönderim iptal edildi"); };
+  xhr.ontimeout = function () { fail("Daha küçük dosyalarla tekrar deneyin.", "Zaman aşımı"); };
+
+  xhr.onload = function () {
+    var r = {};
+    try { r = JSON.parse(xhr.responseText) || {}; } catch (x) {}
+    if (xhr.status < 200 || xhr.status >= 300 || !r.success) {
+      return fail(r.message || "Beklenmeyen bir hata oluştu.");
+    }
+
+    lsSet(Date.now());
+    setBtn("Gönderildi", 100, true);
+    form.reset();
+    files = [];
+    render();
+    openModal("ok", "Teşekkürler!", r.message || "Geri bildiriminiz alındı.");
+
+    clearTimeout(resetTimer);
+    resetTimer = setTimeout(function () {
+      busy = false;
+      $("btn").disabled = false;
+      setBtn("Gönder", 0);
+    }, 3200);
+  };
+
+  xhr.send(fd);
+};
+})();
+</script>
+</body>
+</html>
